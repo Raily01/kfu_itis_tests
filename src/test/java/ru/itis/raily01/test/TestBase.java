@@ -24,6 +24,6 @@ public class TestBase {
 
     @After
     public void tearDown() {
-        app.login().logout();
+        //app.login().logout();
     }
 }

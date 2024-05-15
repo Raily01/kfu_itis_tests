@@ -1,0 +1,8 @@
+baseUrl: https://jut.su/
+accounts:
+  - username: Railyy
+    password: 12345678
+    isValid: true
+  - username: dfasdfsdf
+    password: dsfsdf
+    isValid: false

@@ -1,8 +1,10 @@
 package ru.itis.raily01;
 
+import lombok.Getter;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import ru.itis.raily01.config.Settings;
 import ru.itis.raily01.helper.LoginHelper;
 import ru.itis.raily01.helper.NavigationHelper;
 import ru.itis.raily01.helper.PostHelper;
@@ -13,17 +15,18 @@ import java.util.Map;
 public class ApplicationManager {
     public WebDriver driver;
     private StringBuffer verificationErrors;
-    public String baseUrl;
     public JavascriptExecutor js;
     private Map<String, Object> vars;
     private NavigationHelper navigationHelper;
     private LoginHelper loginHelper;
     private PostHelper postHelper;
+    @Getter
+    private Settings settings;
 
     private static ThreadLocal<ApplicationManager> app = new ThreadLocal<>();
 
     private ApplicationManager() {
-        System.setProperty("webdriver.chrome.driver", "C:\\Users\\shayk\\OneDrive\\Рабочий стол\\chromedriver-win64\\chromedriver.exe");
+        System.setProperty("webdriver.chrome.driver", "/home/aydar/chromedriver-linux64/chromedriver");
         this.driver = new ChromeDriver();
         Thread shutdownHookThread = new Thread(() -> {driver.quit();});
         Runtime.getRuntime().addShutdownHook(shutdownHookThread);
@@ -40,11 +43,11 @@ public class ApplicationManager {
     }
 
     public void setUp() {
+        settings = new Settings();
         js = (JavascriptExecutor) driver;
         vars = new HashMap<>();
-        baseUrl = "https://jut.su/";
         postHelper = new PostHelper(this);
-        navigationHelper = new NavigationHelper(this, baseUrl);
+        navigationHelper = new NavigationHelper(this, settings.getBaseUrl());
         loginHelper = new LoginHelper(this);
     }
 
@@ -67,4 +70,5 @@ public class ApplicationManager {
             // Игнорирование исключения
         }
     }
+
 }
