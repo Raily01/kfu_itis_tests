@@ -5,20 +5,26 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.yaml.snakeyaml.Yaml;
+import ru.itis.raily01.test.CreatePostTest;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 
 public class Settings {
 
-    private final Props properties;
+    private static Props properties;
 
-    public Settings() {
-        try (var is = getClass().getClassLoader().getResourceAsStream("settings.yaml")) {
-            Yaml yaml = new Yaml();
-            properties = yaml.loadAs(is, Props.class);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+     public Settings() {
+        synchronized (Settings.class) {
+            if (properties == null) {
+                try (var is = getClass().getClassLoader().getResourceAsStream("settings.yaml")) {
+                    Yaml yaml = new Yaml();
+                    properties = yaml.loadAs(is, Props.class);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
     }
 
@@ -36,6 +42,12 @@ public class Settings {
         return properties.getAccounts().stream()
                 .filter(account -> !account.getIsValid())
                 .toList();
+    }
+
+    public Optional<Account> getValidAccount() {
+         return properties.getAccounts().stream()
+                 .filter(Account::getIsValid)
+                 .findFirst();
     }
 
     @NoArgsConstructor

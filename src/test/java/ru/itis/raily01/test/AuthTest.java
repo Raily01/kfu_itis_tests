@@ -5,11 +5,8 @@ import org.apache.commons.logging.LogFactory;
 import org.junit.Assert;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebElement;
-import ru.itis.raily01.config.Settings;
+import ru.itis.raily01.base.TestBase;
 import ru.itis.raily01.model.AccountData;
-
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,13 +16,12 @@ public class AuthTest extends TestBase {
 
     @Test
     public void loginWithValidCredentials() {
-        app.goTo().OpenHomePage();
         var validAccounts = app.getSettings().getValidAccounts();
         if (validAccounts.isEmpty()) {
             throw new RuntimeException("Settings doesn't contain valid accounts");
         }
         AccountData user = new AccountData(validAccounts.get(0).getUsername(), validAccounts.get(0).getPassword());
-        app.login().Login(user);
+        app.login().login(user);
 
         // Проверка что логин успешен
         var profileElem = app.driver.findElement(By.xpath("/html/body/div[4]/div[2]/a[1]"));
@@ -35,13 +31,15 @@ public class AuthTest extends TestBase {
 
     @Test
     public void loginWithInvalidCredentials() throws InterruptedException {
-        app.goTo().OpenHomePage();
+        if (app.login().isLoggedIn()) {
+            app.login().logout();
+        }
         var validAccounts = app.getSettings().getInvalidAccounts();
         if (validAccounts.isEmpty()) {
             throw new RuntimeException("Settings doesn't contain invalid accounts");
         }
         AccountData user = new AccountData(validAccounts.get(0).getUsername(), validAccounts.get(0).getPassword());
-        app.login().Login(user);
+        app.login().login(user);
         Thread.sleep(3000);
         assertEquals("Ошибка авторизации", app.driver.findElement(By.className("berrors")).findElement(By.tagName("b")).getText());
     }
